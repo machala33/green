@@ -1,16 +1,19 @@
 import { FlatList, StyleSheet, View, StatusBar } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 
 import { COLORS, SIZES, slides } from "../constants";
 import { OnBoardingFooter, Slide, Button } from "../components";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "../store/auth-context";
 
 const { width, height } = SIZES;
+
+const authContext = useContext(AuthContext);
 
 const OnBoardingScreen = ({ navigation }) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   const scrollRef = useRef();
-
   const updateCurrentSlideIndex = (e) => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(contentOffsetX / width);
@@ -34,7 +37,9 @@ const OnBoardingScreen = ({ navigation }) => {
   };
 
   const onGetStarted = () => {
-    navigation.replace("Registration");
+    // navigation.replace("AuthStack", { screen: "Registration" });
+    authContext.setIsAppFirstLaunched(false);
+    AsyncStorage.setItem("isAppFirstLaunched", "false");
   };
 
   //   const scrollEvent = (e) => {
@@ -47,11 +52,10 @@ const OnBoardingScreen = ({ navigation }) => {
 
   return (
     <View style={styles.rootContainer}>
-      
       <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ height: height * 0.8}}
+        contentContainerStyle={{ height: height * 0.8 }}
         ref={scrollRef}
         pagingEnabled
         onMomentumScrollEnd={updateCurrentSlideIndex}
@@ -68,12 +72,7 @@ const OnBoardingScreen = ({ navigation }) => {
       />
       {currentSlideIndex !== slides.length - 1 && (
         <View style={styles.skip}>
-          <Button
-            onPress={skip}
-            fontSize={17}
-            light
-            color={COLORS.lightGrey}
-          >
+          <Button onPress={skip} fontSize={17} light color={COLORS.primary[500]}>
             Skip
           </Button>
         </View>

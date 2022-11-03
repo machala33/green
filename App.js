@@ -5,10 +5,14 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useContext } from "react";
+
 import { useFonts } from "expo-font";
 import { BlurView } from "expo-blur";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
+import AuthProvider from "./store/auth-context";
+import { AuthContext } from "./store/auth-context";
 import {
   AddressesScreen,
   HistoryScreen,
@@ -31,34 +35,24 @@ import { COLORS } from "./constants";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+const OnBoardingStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Onboarding"
+        options={{
+          headerShown: false,
+        }}
+        component = {OnBoardingScreen}
+      />
+      {/* {(props) => <OnBoardingScreen {...props} setIsAppFirstLaunched={setIsAppFirstLaunched} />}
+      </Stack.Screen> */}
+    </Stack.Navigator>
+  );
+};
 
-export default function App() {
-  const [isLoaded] = useFonts({
-    "sofia-pro": require("./assets/fonts/Metropolis-Medium.otf"),
-    "sofia-pro-bold": require("./assets/fonts/Metropolis-Bold.otf"),
-  });
-  const [isAppFirstLaunched, setIsAppFirstLaunched] = useState(null);
-
-  useEffect(() => {
-    async function getStorage() {
-      const appData = await AsyncStorage.getItem("isAppFirstLaunched");
-      if (appData == null) {
-        setIsAppFirstLaunched(true);
-        AsyncStorage.setItem("isAppFirstLaunched", "false");
-      } else {
-        setIsAppFirstLaunched("false");
-      }
-    }
-
-    getStorage();
-  }, []);
-
-  if (!isLoaded) {
-    return null;
-  }
-
+const AuthenticatedStack = () => {
   const TabNavigation = () => {
-
     return (
       <Tab.Navigator
         screenOptions={{
@@ -89,7 +83,6 @@ export default function App() {
             // paddingBottom: 5,
             // paddingVertical: 5,
             paddingTop: 10,
-            
           },
         }}
         backBehavior="history"
@@ -121,7 +114,7 @@ export default function App() {
           component={SendPackageScreen}
           options={{
             tabBarActiveTintColor: "#ffffff",
-            tabBarIcon: ({ focused,color, size }) => (
+            tabBarIcon: ({ focused, color, size }) => (
               <Icon icon="ios-send-outline" size={size} color={color} focused />
             ),
             tabBarItemStyle: {
@@ -130,11 +123,11 @@ export default function App() {
               // color: "#ffffff",
             },
           }}
-          listeners = {({navigation, route}) => ({
+          listeners={({ navigation, route }) => ({
             tabPress: (e) => {
               e.preventDefault();
-              navigation.navigate("SendPackage")
-            }
+              navigation.navigate("SendPackage");
+            },
           })}
         />
 
@@ -166,45 +159,147 @@ export default function App() {
   };
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <StatusBar style="light" />
-        <Stack.Navigator>
-          {isAppFirstLaunched ? (
-            <Stack.Group
-              screenOptions={{
-                headerShown: true,
-              }}
-            >
-              {/* <Stack.Screen name="Onboarding" component={OnBoardingScreen} />
-              <Stack.Screen
-                name="Registration"
-                component={RegistrationScreen}
-              />
-              <Stack.Screen name="Login" component={LoginScreen} /> */}
-              <Stack.Screen name="TabNavigation" component={TabNavigation} options = {{headerShown: false}} />
-              <Stack.Screen name="Profile" component={ProfileScreen} />
-              <Stack.Screen name="Password" component={PasswordScreen} />
-              <Stack.Screen name="Wallet" component={WalletScreen} />
-              <Stack.Screen name="Addresses" component={AddressesScreen} />
-              <Stack.Screen name="SendPackage" component={SendPackageScreen} options = {{
-                presentation: "modal",
-                headerShown: true,
-                headerBackVisible : "true"
-              }} />
-            </Stack.Group>
-          ) : (
-            <Stack.Group
-              screenOptions={{
-                headerShown: false,
-              }}
-            >
-              <Stack.Screen name="Home" component={HomeScreen} />
-            </Stack.Group>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <Stack.Navigator
+      screenOptions={{
+        headersShown: true,
+      }}
+    >
+      <Stack.Screen
+        name="TabNavigation"
+        component={TabNavigation}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="Password" component={PasswordScreen} />
+      <Stack.Screen name="Wallet" component={WalletScreen} />
+      <Stack.Screen name="Addresses" component={AddressesScreen} />
+      <Stack.Screen
+        name="SendPackage"
+        component={SendPackageScreen}
+        options={{
+          presentation: "modal",
+          headerShown: true,
+          headerBackVisible: "true",
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const AuthStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Group
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="Registration" component={RegistrationScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+      </Stack.Group>
+    </Stack.Navigator>
+  );
+};
+
+const Navigation = () => {
+  const authContext = useContext(AuthContext);
+
+  return (
+    <NavigationContainer>
+      {/* <Stack.Navigator> */}
+      {/* {isAppFirstLaunched ? <OnBoardingStack setIsAppFirstLaunched={setIsAppFirstLaunched} /> : authContext.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />} */}
+      {authContext.isAppFirstLaunched && <OnBoardingStack />}
+      {!authContext.isAuthenticated && <AuthStack />}
+      {authContext.isAuthenticated && <AuthenticatedStack />}
+    </NavigationContainer>
+  );
+};
+
+export default function App() {
+  const [isLoaded] = useFonts({
+    "sofia-pro": require("./assets/fonts/Metropolis-Medium.otf"),
+    "sofia-pro-bold": require("./assets/fonts/Metropolis-Bold.otf"),
+  });
+  // const authContext = useContext(AuthContext);
+  // const [isAppFirstLaunched, setIsAppFirstLaunched] = useState(false);
+
+  // useEffect(() => {
+  //   async function getStorage() {
+  //     const appData = await AsyncStorage.getItem("isAppFirstLaunched");
+  //     if (appData == null) {
+  //       setIsAppFirstLaunched(true);
+  //       AsyncStorage.setItem("isAppFirstLaunched", "false");
+  //     } else {
+  //       setIsAppFirstLaunched(false);
+  //     }
+  //   }
+
+  //   getStorage();
+  // }, []);
+
+  if (!isLoaded) {
+    return null;
+  }
+
+  // const isAuthenticated = authContext.isAuthenticated
+
+  return (
+    <AuthProvider>
+      <SafeAreaProvider>
+        <StatusBar style="dark" />
+        {/* <NavigationContainer> */}
+          <Navigation />
+          {/* <Stack.Navigator> */}
+          {/* {isAppFirstLaunched ? <OnBoardingStack setIsAppFirstLaunched={setIsAppFirstLaunched} /> : authContext.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />} */}
+          {/* {isAppFirstLaunched && <OnBoardingStack setIsAppFirstLaunched={setIsAppFirstLaunched} />}
+          {!authContext.isAuthenticated && <AuthStack />}
+          {authContext.isAuthenticated && <AuthenticatedStack />} */}
+          {/* {isAppFirstLaunched ? (
+              <Stack.Group
+                screenOptions={{
+                  headerShown: true,
+                }}
+              >
+                <Stack.Screen
+                  name="Registration"
+                  component={RegistrationScreen}
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen
+                  name="TabNavigation"
+                  component={TabNavigation}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name="Profile" component={ProfileScreen} />
+                <Stack.Screen name="Password" component={PasswordScreen} />
+                <Stack.Screen name="Wallet" component={WalletScreen} />
+                <Stack.Screen name="Addresses" component={AddressesScreen} />
+                <Stack.Screen
+                  name="SendPackage"
+                  component={SendPackageScreen}
+                  options={{
+                    presentation: "modal",
+                    headerShown: true,
+                    headerBackVisible: "true",
+                  }}
+                />
+              </Stack.Group>
+            ) : (
+              <Stack.Group
+                screenOptions={{
+                  headerShown: false,
+                }}
+              >
+                <Stack.Screen name="Home" component={HomeScreen} />
+              </Stack.Group>
+            )} */}
+          {/* </Stack.Navigator> */}
+        {/* </NavigationContainer> */}
+      </SafeAreaProvider>
+    </AuthProvider>
   );
 }
 

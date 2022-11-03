@@ -9,7 +9,7 @@ const Slide = ({ item }) => {
       <Image style={styles.image} source={item.image} />
 
       <View style = {styles.details}>
-        <CustomText style={styles.title}>{item.title}</CustomText>
+        <CustomText bold style={styles.title}>{item.title}</CustomText>
         <CustomText style={styles.subTitle}>{item.description}</CustomText>
       </View>
     </View>
@@ -48,9 +48,9 @@ const styles = StyleSheet.create({
 
   subTitle: {
     color: COLORS.grey[600],
-    fontSize: 18,
+    fontSize: 16,
     marginTop: 10,
     maxWidth: "80%",
-    lineHeight: 25
+    lineHeight: 20
   }
 });

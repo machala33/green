@@ -1,36 +1,44 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import React, { forwardRef, useState } from "react";
 import { COLORS } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
 import CustomText from "./CustomText";
 
-const IconInput = ({ label, textInputConfig, icon }) => {
-  const [focused, setFocused] = useState(false);
+const IconInput = forwardRef(
+  ({ label, textInputConfig, icon, inValid }, ref) => {
+    const [focused, setFocused] = useState(false);
 
-  const onFocus = () => {
-    setFocused(true);
-  };
+    const onFocus = () => {
+      setFocused(true);
+    };
 
+    const onBlur = () => {
+      setFocused(false);
+    };
 
-  const onBlur = () => {
-    setFocused(false);
-  };
-
-  return (
-    <View style={styles.rootContainer}>
-      <CustomText style={styles.label}>{label}</CustomText>
-      <View style={[styles.inputContainer, focused && styles.focused]}>
-        <Ionicons name={icon} size={24} color={COLORS.grey[500]} />
-        <TextInput
-          onFocus={onFocus}
-          onBlur={onBlur}
-          style={[styles.input]}
-          {...textInputConfig}
-        />
+    return (
+      <View style={styles.rootContainer}>
+        <CustomText style={[styles.label, inValid && {color:"#e91c1c"}]}>{label}</CustomText>
+        <View
+          style={[
+            styles.inputContainer,
+            focused && styles.focused,
+            inValid && { borderColor: "#e91c1c", backgroundColor: "#fff1f1" },
+          ]}
+        >
+          <Ionicons name={icon} size={24} color={COLORS.grey[500]} />
+          <TextInput
+            ref={ref}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            style={[styles.input]}
+            {...textInputConfig}
+          />
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  }
+);
 
 export default IconInput;
 
@@ -42,9 +50,9 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    fontSize: 17,
+    fontSize: 15,
     marginBottom: 5,
-    fontWeight: "400",
+    fontFamily: "sofia-pro-bold",
     color: COLORS.grey[700],
   },
 
