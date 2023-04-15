@@ -3,11 +3,11 @@ import React from 'react'
 import { COLORS } from '../../constants'
 import CustomText from './CustomText'
 
-const Input = ({label, textInputConfig}) => {
+const Input = ({label, textInputConfig, style}) => {
   return (
     <View style = {styles.rootContainer}>
-      <CustomText style = {styles.label}>{label}</CustomText>
-      <TextInput style = {styles.input} {...textInputConfig} />
+      {label && <CustomText style = {styles.label}>{label}</CustomText>}
+      <TextInput style = {[styles.input, style ]} {...textInputConfig} />
     </View>
   )
 }
@@ -17,9 +17,11 @@ export default Input
 const styles = StyleSheet.create({
 
   rootContainer: {
-    width: "100%",
+    // width: "100%",
+    // flex: 1,
+    flexGrow: 1,
     marginVertical: 10,
-    marginHorizontal: 5
+    // marginHorizontal: 5
   },  
 
   label: {
@@ -31,9 +33,9 @@ const styles = StyleSheet.create({
   },
 
   input : {
-    borderColor: COLORS.grey[200],
+    borderColor: COLORS.grey[100],
     borderWidth: 1,
-    backgroundColor: COLORS.grey[100],
+    backgroundColor: COLORS.grey[50],
     fontFamily: "sofia-pro",
     fontSize: 15,
     padding: 10,

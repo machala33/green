@@ -5,6 +5,7 @@ import { auth } from "../util/firebase";
 
 export const AuthContext = createContext({
   token: "",
+  userId: "",
   isAuthenticated: false,
   authenticate: (token) => {},
   logout: () => {},
@@ -14,6 +15,7 @@ export const AuthContext = createContext({
 
 const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState();
+  const [userId, setUserId] = useState();
   const [isAppFirstLaunched, setIsAppFirstLaunched] = useState(false);
 
   useEffect(() => {
@@ -30,17 +32,24 @@ const AuthProvider = ({ children }) => {
     getStorage();
   }, []);
 
-  // useEffect(() => {
-  //   function getAuth() {
-  //     auth.onAuthStateChanged(async (user) => {
-  //       if (user) {
-  //         const token = await user.getIdToken();
-  //       }
-  //     });
-  //   }
+  useEffect(() => {
+    function getAuth() {
+      const unsubscribe = auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          const token = await user.getIdToken();
+          setUserId(user.uid);
+        } else {
+          logout()
+        }
+      });
 
-  //   getAuth();
-  // });
+      return () => {
+        unsubscribe();
+      };
+    }
+
+    getAuth();
+  }, []);
 
   const authenticate = (token) => {
     setAuthToken(token);
@@ -52,6 +61,7 @@ const AuthProvider = ({ children }) => {
 
   const value = {
     token: authToken,
+    userId,
     isAuthenticated: !!authToken,
     authenticate: authenticate,
     logout: logout,

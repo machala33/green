@@ -1,43 +1,32 @@
-import {
-  FlatList,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View, FlatList } from "react-native";
 import React, { useContext, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-import { CustomText, Input, RadioButton } from "../components";
-import { COLORS } from "../constants";
-import IconButton from "../components/UI/IconButton";
-import { useUserContext } from "../hooks/useFormContext";
+import { COLORS } from "../../constants";
+import { CustomText, RadioButton } from "../../components";
+import IconButton from "../../components/UI/IconButton";
+import { UserContext } from "../../store/user-context";
+import { useDeliveryContext, useUserContext } from "../../hooks/useFormContext";
 
-const SendPackageScreen = ({ navigation }) => {
-  const { userAddresses, deliveryDetails, onsetDeliveryDetails } = useUserContext();
+const SendToScreen = ({ navigation }) => {
+  const { userAddresses, deliveryDetails, onsetDeliveryDetails, originAddressId } = useUserContext();
   // const [addresses, setAddresses] = useState(userAddresses);
   const [selected, setSelected] = useState("");
   const [disabled, setDisabled] = useState(true);
 
-  const onSelect = (key) => {
+  const destinationAddresses = userAddresses.filter((address) => {
+      return address.key !== deliveryDetails.originAddressId
+  })
 
+  const onSelect = (key) => {
     const details = userAddresses.find((add) => {
       return add.key === key
     })
 
-    onsetDeliveryDetails("senderAddress", details.val.address)
-    onsetDeliveryDetails("senderName", details.val.firstName + " " + details.val.lastName)
-    onsetDeliveryDetails("senderLandmark", details.val.landmark)
-    onsetDeliveryDetails("senderAddress", details.val.phone)
-    // setDelivery((prevData) => {
-    //   return {
-    //     ...prevData,
-    //     originAddressId: key,
-    //   }
-    // });
+    onsetDeliveryDetails("receiverAddress", details.val.address)
+    onsetDeliveryDetails("receiverName", details.val.firstName + " " + details.val.lastName)
+    onsetDeliveryDetails("receiverLandmark", details.val.landmark)
+    onsetDeliveryDetails("receiverAddress", details.val.phone)
 
     setSelected(key);
     // setAddresses(
@@ -45,12 +34,13 @@ const SendPackageScreen = ({ navigation }) => {
     //     address.id === key ? {...address, selected: true} : {...address, selected: false}
     //   )
     // )
-    const disabled = !!deliveryDetails.senderAddress;
+
+    const disabled = !!deliveryDetails.receiverAddress;
     setDisabled(!disabled);
   };
 
   const proceed = () => {
-    navigation.navigate("SendTo");
+    navigation.navigate("DeliveryItems");
   };
 
   const renderAddresses = ({ item }) => {
@@ -80,16 +70,15 @@ const SendPackageScreen = ({ navigation }) => {
   return (
     <>
       <View
-        style={{
-          backgroundColor: "#fff",
-          flex: 1,
-          paddingTop: 30,
-          padding: 20,
-        }}
-        contentContainerStyle={{}}
+      style={{
+        backgroundColor: "#fff",
+        flex: 1,
+        paddingTop: 30,
+        padding: 20,
+      }}
       >
         <CustomText style={{ fontSize: 23, lineHeight: 30 }} bold>
-          Where are we picking your package from?
+          Where are we dropping off your package?
         </CustomText>
         <View style={{ marginTop: 40 }}>
           <View style={{ marginBottom: 10 }}>
@@ -127,7 +116,7 @@ const SendPackageScreen = ({ navigation }) => {
           <View style={{ marginTop: 20, flex: 1 }}>
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={userAddresses}
+              data={destinationAddresses}
               renderItem={renderAddresses}
               keyExtractor={(i) => i.key}
             />
@@ -154,7 +143,7 @@ const SendPackageScreen = ({ navigation }) => {
   );
 };
 
-export default SendPackageScreen;
+export default SendToScreen;
 
 const styles = StyleSheet.create({
   textContainer: {

@@ -2,9 +2,9 @@ import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-nativ
 import React from "react";
 import { COLORS } from "../../constants";
 
-const Button = ({ children, filled, color, fontSize, light, onPress, full }) => {
+const Button = ({ children, filled, color, fontSize, light, onPress, full, disabled }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.button, !filled && {backgroundColor: "none"}, full && styles.full]}>
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.button, disabled && {opacity: 0.6}, !filled && {backgroundColor: "none"}, full && styles.full]}>
       <View style={styles.textContainer}>
         <Text style={[styles.buttonText, fontSize && {fontSize}, color && {color}, light && {fontWeight: "normal"}]}>{children}</Text>
       </View>

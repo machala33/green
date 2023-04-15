@@ -31,6 +31,11 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Icon } from "./components";
 import { COLORS } from "./constants";
+import SendToScreen from "./screens/sendPackage/SendToScreen";
+import DeliveryItemsScreen from "./screens/sendPackage/DeliveryItemsScreen";
+import SummaryScreen from "./screens/sendPackage/SummaryScreen";
+import UserProvider, { UserContext } from "./store/user-context";
+import { useUserContext } from "./hooks/useFormContext";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,7 +48,7 @@ const OnBoardingStack = () => {
         options={{
           headerShown: false,
         }}
-        component = {OnBoardingScreen}
+        component={OnBoardingScreen}
       />
       {/* {(props) => <OnBoardingScreen {...props} setIsAppFirstLaunched={setIsAppFirstLaunched} />}
       </Stack.Screen> */}
@@ -177,11 +182,14 @@ const AuthenticatedStack = () => {
         name="SendPackage"
         component={SendPackageScreen}
         options={{
-          presentation: "modal",
+          // presentation: "modal",
           headerShown: true,
           headerBackVisible: "true",
         }}
       />
+      <Stack.Screen name="SendTo" component={SendToScreen} />
+      <Stack.Screen name="DeliveryItems" component={DeliveryItemsScreen} />
+      <Stack.Screen name="Summary" component={SummaryScreen} />
     </Stack.Navigator>
   );
 };
@@ -201,6 +209,13 @@ const AuthStack = () => {
   );
 };
 
+const Authenticated = () => {
+  const {loading} = useContext(UserContext);
+  
+  return !loading && <AuthenticatedStack />;
+
+}
+
 const Navigation = () => {
   const authContext = useContext(AuthContext);
 
@@ -208,34 +223,40 @@ const Navigation = () => {
     <NavigationContainer>
       {/* <Stack.Navigator> */}
       {/* {isAppFirstLaunched ? <OnBoardingStack setIsAppFirstLaunched={setIsAppFirstLaunched} /> : authContext.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />} */}
+
       {authContext.isAppFirstLaunched && <OnBoardingStack />}
       {!authContext.isAuthenticated && <AuthStack />}
-      {authContext.isAuthenticated && <AuthenticatedStack />}
+      {authContext.isAuthenticated && (
+        <UserProvider>
+          <Authenticated />
+          {/* {!loading && <AuthenticatedStack />} */}
+        </UserProvider>
+      )}
     </NavigationContainer>
   );
 };
 
 export default function App() {
   const [isLoaded] = useFonts({
-    "sofia-pro": require("./assets/fonts/Metropolis-Medium.otf"),
-    "sofia-pro-bold": require("./assets/fonts/Metropolis-Bold.otf"),
+    "sofia-pro": require("./assets/fonts/circular-std-medium-500.ttf"),
+    "sofia-pro-bold": require("./assets/fonts/circular-std-medium-500.ttf"),
   });
-  // const authContext = useContext(AuthContext);
-  // const [isAppFirstLaunched, setIsAppFirstLaunched] = useState(false);
+  const authContext = useContext(AuthContext);
+  const [isAppFirstLaunched, setIsAppFirstLaunched] = useState(false);
 
-  // useEffect(() => {
-  //   async function getStorage() {
-  //     const appData = await AsyncStorage.getItem("isAppFirstLaunched");
-  //     if (appData == null) {
-  //       setIsAppFirstLaunched(true);
-  //       AsyncStorage.setItem("isAppFirstLaunched", "false");
-  //     } else {
-  //       setIsAppFirstLaunched(false);
-  //     }
-  //   }
+  useEffect(() => {
+    async function getStorage() {
+      const appData = await AsyncStorage.getItem("isAppFirstLaunched");
+      if (appData == null) {
+        setIsAppFirstLaunched(true);
+        AsyncStorage.setItem("isAppFirstLaunched", "false");
+      } else {
+        setIsAppFirstLaunched(false);
+      }
+    }
 
-  //   getStorage();
-  // }, []);
+    getStorage();
+  }, []);
 
   if (!isLoaded) {
     return null;
@@ -248,13 +269,13 @@ export default function App() {
       <SafeAreaProvider>
         <StatusBar style="dark" />
         {/* <NavigationContainer> */}
-          <Navigation />
-          {/* <Stack.Navigator> */}
-          {/* {isAppFirstLaunched ? <OnBoardingStack setIsAppFirstLaunched={setIsAppFirstLaunched} /> : authContext.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />} */}
-          {/* {isAppFirstLaunched && <OnBoardingStack setIsAppFirstLaunched={setIsAppFirstLaunched} />}
+        <Navigation />
+        {/* <Stack.Navigator> */}
+        {/* {isAppFirstLaunched ? <OnBoardingStack setIsAppFirstLaunched={setIsAppFirstLaunched} /> : authContext.isAuthenticated ? <AuthenticatedStack /> : <AuthStack />} */}
+        {/* {isAppFirstLaunched && <OnBoardingStack setIsAppFirstLaunched={setIsAppFirstLaunched} />}
           {!authContext.isAuthenticated && <AuthStack />}
           {authContext.isAuthenticated && <AuthenticatedStack />} */}
-          {/* {isAppFirstLaunched ? (
+        {/* {isAppFirstLaunched ? (
               <Stack.Group
                 screenOptions={{
                   headerShown: true,
@@ -296,7 +317,7 @@ export default function App() {
                 <Stack.Screen name="Home" component={HomeScreen} />
               </Stack.Group>
             )} */}
-          {/* </Stack.Navigator> */}
+        {/* </Stack.Navigator> */}
         {/* </NavigationContainer> */}
       </SafeAreaProvider>
     </AuthProvider>
@@ -304,10 +325,10 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  // container: {
+  //   flex: 1,
+  //   backgroundColor: "#ffffff",
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  // },
 });

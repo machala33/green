@@ -69,6 +69,7 @@ const RegistrationScreen = ({ navigation }) => {
   };
 
   const submitHandler = () => {
+    
     const usernameIsValid = inputs.username.value.trim().length > 3;
     const emailIsValid = inputs.email.value.trim().length > 3;
     const phoneIsValid = inputs.phone.value.trim().length > 3;
@@ -104,7 +105,7 @@ const RegistrationScreen = ({ navigation }) => {
 
   useEffect(() => {
     !isAuthenticating && username.current.focus();
-  }, []);
+  }, [isAuthenticating]);
 
   if (isAuthenticating) {
     return <LoadingOverlay />;

@@ -6,7 +6,7 @@ import IconInput from "../components/UI/IconInput";
 import { COLORS } from "../constants";
 import * as Linking from "expo-linking";
 import { AuthContext } from "../store/auth-context";
-import { login } from "../util/auth";
+import { login, readUserData } from "../util/auth";
 import { async } from "@firebase/util";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { auth } from "../util/firebase";
@@ -39,7 +39,7 @@ const LoginScreen = ({ navigation }) => {
 
     try {
       const response = await login(user.email, user.password);
-      const idToken = await auth.currentUser.getIdToken()
+      const idToken = await auth.currentUser.getIdToken();
 
       authContext.authenticate(idToken);
     } catch (error) {
@@ -64,7 +64,6 @@ const LoginScreen = ({ navigation }) => {
         },
       }));
     }
-    console.log("pee");
     signIn();
   };
 

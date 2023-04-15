@@ -31,7 +31,7 @@ const IconInput = forwardRef(
             ref={ref}
             onFocus={onFocus}
             onBlur={onBlur}
-            style={[styles.input]}
+            style={styles.input}
             {...textInputConfig}
           />
         </View>

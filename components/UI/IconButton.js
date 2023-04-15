@@ -5,8 +5,10 @@ import CustomText from "./CustomText";
 
 const IconButton = ({
   children,
+  disabled,
   icon,
   color,
+  textColor,
   size,
   style,
   filled,
@@ -15,6 +17,7 @@ const IconButton = ({
 }) => {
   return (
     <TouchableOpacity
+    disabled={disabled}
       onPress={onPress}
       style={[
         {
@@ -27,6 +30,7 @@ const IconButton = ({
           borderRadius: 5,
         },
         !filled && {borderColor: color},
+        disabled && {opacity: 0.6},
         style,
       ]}
     >

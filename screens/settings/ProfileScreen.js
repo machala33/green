@@ -10,8 +10,10 @@ import React from "react";
 import { COLORS } from "../../constants";
 import { CustomText, Icon, Input } from "../../components";
 import { useNavigation } from "@react-navigation/native";
+import { useUserContext } from "../../hooks/useFormContext";
 
 const ProfileScreen = () => {
+  const {user: {username, email, phone}} = useUserContext()
   const navigation = useNavigation();
 
   return (
@@ -59,31 +61,31 @@ const ProfileScreen = () => {
           </View>
 
           <View style={{ marginTop: 20 }}>
-            <Input
+            {/* <Input
               label={"First Name"}
               textInputConfig={{
                 placeholder: "Stack",
               }}
-            />
+            /> */}
 
             <Input
-              label={"Last Name"}
+              label={"Username"}
               textInputConfig={{
-                placeholder: "Professional",
+                value: username
               }}
             />
 
             <Input
               label={"Email Address"}
               textInputConfig={{
-                placeholder: "stackpro@stack.com",
+                value: email
               }}
             />
 
             <Input
               label={"Phone"}
               textInputConfig={{
-                placeholder: "051785541598",
+                value: phone
               }}
             />
 

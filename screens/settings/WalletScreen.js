@@ -1,12 +1,36 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useRef } from "react";
 import { CustomText, Icon } from "../../components";
 import { COLORS } from "../../constants";
 
+// import { Paystack, paystackProps } from "react-native-paystack-webview";
+import { useUserContext } from "../../hooks/useFormContext";
+
 const WalletScreen = () => {
+  const { user: email } = useUserContext();
+
+  const paystackWebViewRef = useRef(paystackProps.PayStackRef);
   return (
     <View style={{ backgroundColor: "#ffffff", flex: 1 }}>
-      <ScrollView>
+      <ScrollView style={{ flex: 1 }}>
+        {/* <Paystack
+          paystackKey="pk_test_76584c5569ae84cb5a5d6534df2479479c88a9f4"
+          billingEmail={email}
+          amount={"25000.00"}
+          onCancel={(e) => {
+            console.log(e);
+          }}
+          onSuccess={(res) => {
+            console.log(res);
+          }}
+          ref={paystackWebViewRef}
+        /> */}
         <View style={{ padding: 20, flex: 1 }}>
           <CustomText
             bold
@@ -16,9 +40,15 @@ const WalletScreen = () => {
           </CustomText>
 
           <CustomText
-            style={{ fontSize: 14, color: COLORS.grey[600], lineHeight: 22, marginTop: 10 }}
+            style={{
+              fontSize: 14,
+              color: COLORS.grey[600],
+              lineHeight: 22,
+              marginTop: 10,
+            }}
           >
-            Select from below, a payment method to fund your wallet. Your wallet is funded instantaneouly.
+            Select from below, a payment method to fund your wallet. Your wallet
+            is funded instantaneouly.
           </CustomText>
 
           <View
@@ -61,20 +91,27 @@ const WalletScreen = () => {
 
           <View>
             <TouchableOpacity
+              onPress={() => paystackWebViewRef.current.startTransaction()}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
                 paddingVertical: 30,
                 borderBottomColor: COLORS.grey[200],
-                borderBottomWidth: 1
+                borderBottomWidth: 1,
               }}
             >
-              <View style={{flex: 0.9}}>
+              <View style={{ flex: 0.9 }}>
                 <CustomText bold style={{ fontSize: 17 }}>
                   Debit Card
                 </CustomText>
-                <CustomText style={{ fontSize: 13, color: COLORS.grey[600], marginTop: 10 }}>
+                <CustomText
+                  style={{
+                    fontSize: 13,
+                    color: COLORS.grey[600],
+                    marginTop: 10,
+                  }}
+                >
                   Fund your account via your debit card
                 </CustomText>
               </View>
@@ -89,14 +126,21 @@ const WalletScreen = () => {
                 justifyContent: "space-between",
                 paddingVertical: 30,
                 borderBottomColor: COLORS.grey[200],
-                borderBottomWidth: 1
+                borderBottomWidth: 1,
               }}
             >
-              <View style={{flex: 0.9}}>
+              <View style={{ flex: 0.9 }}>
                 <CustomText bold style={{ fontSize: 17 }}>
                   Bank Account
                 </CustomText>
-                <CustomText style={{ fontSize: 13, color: COLORS.grey[600], marginTop: 10, lineHeight: 20 }}>
+                <CustomText
+                  style={{
+                    fontSize: 13,
+                    color: COLORS.grey[600],
+                    marginTop: 10,
+                    lineHeight: 20,
+                  }}
+                >
                   Fund your account by tranferring to a bank account
                 </CustomText>
               </View>

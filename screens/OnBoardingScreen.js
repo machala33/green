@@ -8,10 +8,10 @@ import { AuthContext } from "../store/auth-context";
 
 const { width, height } = SIZES;
 
-const authContext = useContext(AuthContext);
 
 const OnBoardingScreen = ({ navigation }) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const authContext = useContext(AuthContext);
 
   const scrollRef = useRef();
   const updateCurrentSlideIndex = (e) => {
